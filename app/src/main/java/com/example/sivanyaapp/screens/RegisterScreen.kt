@@ -17,6 +17,7 @@ import com.example.sivanyaapp.api.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.security.MessageDigest
 
 @Composable
 fun RegisterScreen(navController: NavHostController) {
@@ -26,9 +27,32 @@ fun RegisterScreen(navController: NavHostController) {
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
+    // Function to hash the password using SHA-256
+    fun hashPassword(password: String): String {
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            val hashedBytes = digest.digest(password.toByteArray())
+            hashedBytes.joinToString("") { "%02x".format(it) }  // Convert bytes to hexadecimal
+        } catch (e: Exception) {
+            Log.e("RegisterScreen", "Password hashing error: ${e.message}")
+            ""
+        }
+    }
+
     // Handle the Register Click
     fun onRegisterClick() {
+        // Ensure password is not empty before hashing
+        if (password.isEmpty()) {
+            errorMessage = "Password cannot be empty."
+            return
+        }
+
         val passwordHash = hashPassword(password)  // Hash the password before sending
+
+        if (passwordHash.isEmpty()) {
+            errorMessage = "Password hashing failed."
+            return
+        }
 
         // Create User object
         val user = User(email, phone, fullName, passwordHash)
@@ -39,17 +63,26 @@ fun RegisterScreen(navController: NavHostController) {
 
         call.enqueue(object : Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
-                if (response.isSuccessful) {
-                    // Navigate to home screen on successful registration
-                    navController.navigate("home")
-                } else {
-                    errorMessage = "Registration failed: ${response.message()}"
+                try {
+                    if (response.isSuccessful) {
+                        // Navigate to home screen on successful registration
+                        navController.navigate("home")
+                    } else {
+                        // Log the response message for debugging
+                        errorMessage = "Registration failed: ${response.message()}"
+                        Log.e("RegisterScreen", "Registration failed: ${response.message()}")
+                    }
+                } catch (e: Exception) {
+                    // Log exception during response handling
+                    errorMessage = "Error processing response: ${e.message}"
+                    Log.e("RegisterScreen", "Error processing response: ${e.message}")
                 }
             }
 
             override fun onFailure(call: Call<User>, t: Throwable) {
-                errorMessage = "Error: ${t.message}"
-                Log.e("RegistrationError", t.message ?: "Unknown error")
+                // Log network failure
+                errorMessage = "Network Error: ${t.message}"
+                Log.e("RegisterScreen", "Network Error: ${t.message}")
             }
         })
     }

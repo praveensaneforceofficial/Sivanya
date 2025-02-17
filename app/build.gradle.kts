@@ -20,7 +20,18 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Define custom BuildConfig fields for BASE_URL in debug build
+            buildConfigField("String", "BASE_URL", "\"https://sivanyaapi.onrender.com\"")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
         release {
+            // Define custom BuildConfig fields for BASE_URL in release build
+            buildConfigField("String", "BASE_URL", "\"https://sivanyaapi.onrender.com\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -28,23 +39,28 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
-        compose = true
+        compose = true // Enable Jetpack Compose
+        buildConfig = true // Enable BuildConfig feature
     }
 }
 
 dependencies {
+    // AndroidX Dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.androidx.compose.bom)) // Jetpack Compose BOM
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -53,6 +69,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // Test Dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,11 +79,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Compose Dependencies
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.material3)
 
-    // Navigation
+    // Navigation Component
     implementation(libs.androidx.navigation.compose)
 
     // Hilt for Dependency Injection
@@ -73,17 +92,16 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // ViewModel
+    // ViewModel Compose Integration
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Room DB (if needed)
+    // Room Database (if you're using it)
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    // Retrofit and Gson dependencies
+    // Retrofit, Gson and OkHttp for Networking
     implementation(libs.retrofit)
     implementation(libs.gson)
     implementation(libs.okhttp)
-
 }
