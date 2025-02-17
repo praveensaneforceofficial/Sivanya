@@ -1,5 +1,6 @@
 package com.example.sivanyaapp.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,15 +11,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.sivanyaapp.api.ApiInterface
+import com.example.sivanyaapp.api.RetrofitClient
+import com.example.sivanyaapp.api.User
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun RegisterScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
+    // Handle the Register Click
     fun onRegisterClick() {
-        navController.navigate("home")
+        val passwordHash = hashPassword(password)  // Hash the password before sending
+
+        // Create User object
+        val user = User(email, phone, fullName, passwordHash)
+
+        // Make API call to register user
+        val apiService = RetrofitClient.instance.create(ApiInterface::class.java)
+        val call = apiService.registerUser(user)
+
+        call.enqueue(object : Callback<User> {
+            override fun onResponse(call: Call<User>, response: Response<User>) {
+                if (response.isSuccessful) {
+                    // Navigate to home screen on successful registration
+                    navController.navigate("home")
+                } else {
+                    errorMessage = "Registration failed: ${response.message()}"
+                }
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                errorMessage = "Error: ${t.message}"
+                Log.e("RegistrationError", t.message ?: "Unknown error")
+            }
+        })
     }
 
     Column(
@@ -35,6 +68,7 @@ fun RegisterScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        // Email Input
         TextField(
             value = email,
             onValueChange = { email = it },
@@ -45,6 +79,7 @@ fun RegisterScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Phone Input
         TextField(
             value = phone,
             onValueChange = { phone = it },
@@ -55,6 +90,7 @@ fun RegisterScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Full Name Input
         TextField(
             value = fullName,
             onValueChange = { fullName = it },
@@ -63,8 +99,29 @@ fun RegisterScreen(navController: NavHostController) {
             singleLine = true
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Password Input
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        // Error Message
+        if (errorMessage.isNotEmpty()) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Register Button
         Button(
             onClick = { onRegisterClick() },
             modifier = Modifier.fillMaxWidth()
@@ -74,6 +131,7 @@ fun RegisterScreen(navController: NavHostController) {
     }
 }
 
+// Preview
 @Preview(showBackground = true)
 @Composable
 fun PreviewRegisterScreen() {
