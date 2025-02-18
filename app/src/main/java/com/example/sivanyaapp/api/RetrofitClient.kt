@@ -1,24 +1,27 @@
 package com.example.sivanyaapp.api
 
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
+import com.google.gson.GsonBuilder
 
 object RetrofitClient {
 
-    // Load properties from gradle.properties
-    private val properties: Properties = Properties().apply {
-        load(javaClass.classLoader?.getResourceAsStream("gradle.properties"))
-    }
+    const val BASE_URL = "https://sivanyaapi.onrender.com"  // Your base URL
 
-    // Access BASE_URL directly from gradle.properties
-    private val BASE_URL = properties.getProperty("BASE_URL", "https://default.url") // Use default URL if not found
-
-    // Initialize Retrofit client
+    // Initialize Retrofit client with logging
     val instance: Retrofit by lazy {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
+
         Retrofit.Builder()
             .baseUrl(BASE_URL)  // Use the loaded BASE_URL
-            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)  // Add logging client
+            .addConverterFactory(GsonConverterFactory.create())  // Gson for JSON parsing if needed
             .build()
     }
 }

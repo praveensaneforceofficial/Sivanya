@@ -14,10 +14,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sivanyaapp.api.ApiInterface
 import com.example.sivanyaapp.api.RetrofitClient
 import com.example.sivanyaapp.api.User
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.security.MessageDigest
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @Composable
 fun RegisterScreen(navController: NavHostController) {
@@ -61,25 +63,31 @@ fun RegisterScreen(navController: NavHostController) {
         val apiService = RetrofitClient.instance.create(ApiInterface::class.java)
         val call = apiService.registerUser(user)
 
-        call.enqueue(object : Callback<User> {
-            override fun onResponse(call: Call<User>, response: Response<User>) {
+        call.enqueue(object : Callback<ResponseBody> {  // Use ResponseBody for raw response
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 try {
                     if (response.isSuccessful) {
-                        // Navigate to home screen on successful registration
-                        navController.navigate("home")
+                        val responseBody = response.body()?.string()  // Read raw response body as string
+                        if (responseBody != null && responseBody.contains("User registered successfully")) {
+                            // Navigate to home screen on successful registration
+                            navController.navigate("home")
+                        } else {
+                            errorMessage = "Registration failed: $responseBody"
+                            Log.e("RegisterScreen", "Registration failed: $responseBody")
+                        }
                     } else {
-                        // Log the response message for debugging
-                        errorMessage = "Registration failed: ${response.message()}"
-                        Log.e("RegisterScreen", "Registration failed: ${response.message()}")
+                        // Log the full error body for debugging
+                        val errorBody = response.errorBody()?.string()
+                        errorMessage = "Registration failed: ${response.message()} - $errorBody"
+                        Log.e("RegisterScreen", "Registration failed: ${response.message()} - $errorBody")
                     }
                 } catch (e: Exception) {
-                    // Log exception during response handling
                     errorMessage = "Error processing response: ${e.message}"
                     Log.e("RegisterScreen", "Error processing response: ${e.message}")
                 }
             }
 
-            override fun onFailure(call: Call<User>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 // Log network failure
                 errorMessage = "Network Error: ${t.message}"
                 Log.e("RegisterScreen", "Network Error: ${t.message}")
@@ -139,6 +147,7 @@ fun RegisterScreen(navController: NavHostController) {
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )

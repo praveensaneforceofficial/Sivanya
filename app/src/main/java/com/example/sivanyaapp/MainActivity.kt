@@ -1,5 +1,6 @@
 package com.example.sivanyaapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,11 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.*
-
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.navigation.compose.rememberNavController  // <-- Add this import
 import androidx.navigation.compose.*
 import com.example.sivanyaapp.screens.LoginScreen
 import com.example.sivanyaapp.screens.HomeScreen
@@ -24,19 +20,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Check if the user is logged in
+        val sharedPreferences = getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+
         setContent {
             SivanyaAPPTheme {
                 val navController = rememberNavController()
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login"
+                    startDestination = if (isLoggedIn) "home" else "login"
                 ) {
                     composable("login") {
                         LoginScreen(navController)
                     }
                     composable("home") {
-                        HomeScreen()
+                        HomeScreen(navController)
                     }
                     composable("forgetPassword") {
                         ForgetPasswordScreen(navController)
