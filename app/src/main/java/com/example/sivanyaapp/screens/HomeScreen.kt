@@ -13,20 +13,26 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.foundation.layout.Arrangement  // Add this import
+
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
     // Function to handle logout logic
     fun onLogoutClick() {
-        // Clear login state from SharedPreferences
         val sharedPreferences = navController.context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
+        val email = sharedPreferences.getString("email", "")
         val editor = sharedPreferences.edit()
         editor.putBoolean("isLoggedIn", false)  // Mark as logged out
         editor.apply()
 
         // Navigate to login screen
         navController.navigate("login") {
-            // To ensure the back stack is cleared so user cannot navigate back to home
             popUpTo("home") { inclusive = true }
         }
     }
@@ -60,6 +66,62 @@ fun HomeScreen(navController: NavHostController) {
                     Text("Logout")
                 }
             }
+
+            // Bottom Row with multiple icons
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp) // Adjust the padding as needed
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp) // Ensure it is at the bottom
+                ) {
+                    // Home Icon
+                    IconButton(onClick = { /* Handle Home icon click */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Home,
+                            contentDescription = "Home Icon",
+                            modifier = Modifier.size(48.dp),
+                            tint = Color(0xFF00796B)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Category Icon
+                    IconButton(onClick = { /* Handle Category icon click */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite, // Use the favorite icon for category
+                            contentDescription = "Favorite Icon",
+                            modifier = Modifier.size(48.dp),
+                            tint = Color(0xFF00796B)
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Cart Icon
+                    IconButton(onClick = { /* Handle Cart icon click */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.ShoppingCart,
+                            contentDescription = "Cart Icon",
+                            modifier = Modifier.size(48.dp),
+                            tint = Color(0xFF00796B)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Profile Icon
+                    IconButton(onClick = { /* Handle Profile icon click */ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profile Icon",
+                            modifier = Modifier.size(48.dp),
+                            tint = Color(0xFF00796B)
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -67,6 +129,5 @@ fun HomeScreen(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {
-    // Use rememberNavController to preview the navigation flow
     HomeScreen(navController = rememberNavController())
 }
