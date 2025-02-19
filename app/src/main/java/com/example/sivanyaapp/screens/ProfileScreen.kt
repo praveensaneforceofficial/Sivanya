@@ -6,44 +6,48 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavHostController) {
-    val sharedPreferences = navController.context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
-    val email = sharedPreferences.getString("email", "User")
+    val context = LocalContext.current
 
-    fun onLogoutClick() {
-        sharedPreferences.edit().putBoolean("isLoggedIn", false).apply()
+    fun logoutUser() {
+        // Clear login state from SharedPreferences
+        val sharedPreferences = context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear() // Clears all stored preferences
+        editor.apply()
+
+        // Navigate back to login screen
         navController.navigate("login") {
-            popUpTo("profile") { inclusive = true }
+            popUpTo("home") { inclusive = true } // Removes home screen from back stack
         }
     }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Profile") }) }
-    ) { padding ->
+    MainScreen(navController) {  // Keeping the same structure as your Cart screen
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Hello, $email", fontSize = 24.sp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { onLogoutClick() }, modifier = Modifier.fillMaxWidth(0.6f)) {
-                Text("Logout")
+            Text(text = "Profile", fontSize = 32.sp, modifier = Modifier.padding(top = 50.dp))
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = { logoutUser() },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .padding(bottom = 20.dp)
+            ) {
+                Text(text = "Logout", fontSize = 18.sp)
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewProfileScreen() {
-    ProfileScreen(navController = rememberNavController())
 }

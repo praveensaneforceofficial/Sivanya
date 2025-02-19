@@ -12,7 +12,6 @@ import androidx.navigation.compose.*
 import com.example.sivanyaapp.screens.CartScreen
 import com.example.sivanyaapp.screens.LoginScreen
 import com.example.sivanyaapp.screens.HomeScreen
-import com.example.sivanyaapp.screens.CategoryScreen
 import com.example.sivanyaapp.screens.ProductListScreen
 import com.example.sivanyaapp.screens.ProfileScreen
 import com.example.sivanyaapp.screens.RegisterScreen
@@ -37,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("login") { LoginScreen(navController) }
                     composable("home") { HomeScreen(navController) }
-                    composable("categories") { CategoryScreen(navController) }
+                    composable("categories") { CartScreen(navController) }
                     composable("cart") { CartScreen(navController) }
                     composable("profile") { ProfileScreen(navController) }
                     composable("products") { ProductListScreen(navController) }
