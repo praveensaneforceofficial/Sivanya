@@ -56,6 +56,7 @@ fun LoginScreen(navController: NavHostController) {
                             val sharedPreferences = navController.context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
                             val editor = sharedPreferences.edit()
                             editor.putBoolean("isLoggedIn", true)  // Mark as logged in
+                            editor.putString("email", username)
                             editor.apply()
 
                             // Navigate to home screen on successful login

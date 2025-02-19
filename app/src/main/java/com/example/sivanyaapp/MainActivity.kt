@@ -20,7 +20,7 @@ import com.example.sivanyaapp.ui.theme.SivanyaAPPTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
 
         // Check if the user is logged in
         val sharedPreferences = getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)

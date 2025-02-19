@@ -12,6 +12,10 @@ interface ApiInterface {
 
     @POST("login")  // Adjust the endpoint as per your backend
     fun loginUser(@Body credentials: LoginCredentials): Call<ResponseBody>
+
+    @POST("getUser") // Ensure this matches your backend API
+    fun getUserProfile(@Body request: UserEmailRequest): Call<UserProfileResponse>
+
 }
 
 
