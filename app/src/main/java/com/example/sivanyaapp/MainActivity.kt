@@ -9,9 +9,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.*
+import com.example.sivanyaapp.screens.CartScreen
 import com.example.sivanyaapp.screens.LoginScreen
 import com.example.sivanyaapp.screens.HomeScreen
-import com.example.sivanyaapp.screens.ForgetPasswordScreen
+import com.example.sivanyaapp.screens.CategoryScreen
+import com.example.sivanyaapp.screens.ProductListScreen
+import com.example.sivanyaapp.screens.ProfileScreen
 import com.example.sivanyaapp.screens.RegisterScreen
 import com.example.sivanyaapp.ui.theme.SivanyaAPPTheme
 
@@ -32,19 +35,14 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = if (isLoggedIn) "home" else "login"
                 ) {
-                    composable("login") {
-                        LoginScreen(navController)
-                    }
-                    composable("home") {
-                        HomeScreen(navController)
-                    }
-                    composable("forgetPassword") {
-                        ForgetPasswordScreen(navController)
-                    }
-                    composable("register") {
-                        RegisterScreen(navController)
-                    }
+                    composable("login") { LoginScreen(navController) }
+                    composable("home") { HomeScreen(navController) }
+                    composable("categories") { CategoryScreen(navController) }
+                    composable("cart") { CartScreen(navController) }
+                    composable("profile") { ProfileScreen(navController) }
+                    composable("products") { ProductListScreen(navController) }
                 }
+
             }
         }
     }

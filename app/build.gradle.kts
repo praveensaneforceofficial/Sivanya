@@ -104,4 +104,5 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.gson)
     implementation(libs.okhttp)
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
