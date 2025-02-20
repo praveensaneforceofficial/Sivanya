@@ -105,4 +105,5 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.okhttp)
     implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 }

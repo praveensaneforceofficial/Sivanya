@@ -16,6 +16,8 @@ interface ApiInterface {
     @POST("getUser") // Ensure this matches your backend API
     fun getUserProfile(@Body request: UserEmailRequest): Call<UserProfileResponse>
 
+    @POST("updateUser")  // Adjust endpoint based on your backend API
+    fun updateUserProfile(@Body request: UserProfileUpdateRequest): Call<ResponseBody>
 }
 
 
