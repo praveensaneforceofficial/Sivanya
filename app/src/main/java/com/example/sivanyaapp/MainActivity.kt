@@ -10,8 +10,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.*
 import com.example.sivanyaapp.screens.CartScreen
+import com.example.sivanyaapp.screens.FavoriteScreen
 import com.example.sivanyaapp.screens.LoginScreen
 import com.example.sivanyaapp.screens.HomeScreen
+import com.example.sivanyaapp.screens.ProductDetailScreen
 import com.example.sivanyaapp.screens.ProductListScreen
 import com.example.sivanyaapp.screens.ProfileScreen
 import com.example.sivanyaapp.screens.RegisterScreen
@@ -36,10 +38,15 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("login") { LoginScreen(navController) }
                     composable("home") { HomeScreen(navController) }
-                    composable("categories") { CartScreen(navController) }
+                    composable("categories") { FavoriteScreen(navController) }
                     composable("cart") { CartScreen(navController) }
                     composable("profile") { ProfileScreen(navController) }
                     composable("products") { ProductListScreen(navController) }
+                    composable("productDetails/{productId}") { backStackEntry ->
+                        val productId = backStackEntry.arguments?.getString("productId") ?: "0"
+                        ProductDetailScreen(productId)
+                    }
+
                 }
 
             }

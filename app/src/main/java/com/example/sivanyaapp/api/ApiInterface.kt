@@ -35,6 +35,13 @@ interface ApiInterface {
 
     @POST("addProduct") // Backend API to store product data
     fun uploadProductDetails(@Body product: ProductRequest): Call<ResponseBody>
+
+    @POST("getFavorites")
+    fun getFavoriteProducts(@Body request: UserEmailRequest): Call<List<Product>>
+
+    @POST("getProductById")
+    fun getProductById(@Body request: ProductIdRequest): Call<Product>
+
 }
 
 
