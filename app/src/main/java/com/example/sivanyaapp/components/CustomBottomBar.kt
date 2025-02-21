@@ -4,14 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,22 +28,21 @@ fun CustomBottomBar(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 20.dp) // Small bottom padding
-            .padding(horizontal = 10.dp),
-        contentAlignment = Alignment.Center
+            .background(Color.Transparent), // Keeps it visually distinct
+        contentAlignment = Alignment.BottomCenter
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .shadow(10.dp, RoundedCornerShape(50)) // Floating effect
+                .fillMaxWidth()
+                .shadow(4.dp) // Slight shadow for depth
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFFFF0266), Color(0xFFFF6699))
-                    ),
-                    shape = RoundedCornerShape(50)
+                        colors = listOf(Color(0xFF6200EE), Color(0xFFBB86FC))
+                    )
                 )
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             CustomNavItem("home", Icons.Filled.Home, currentRoute, navController)
             CustomNavItem("categories", Icons.Filled.Favorite, currentRoute, navController)
@@ -57,21 +54,27 @@ fun CustomBottomBar(navController: NavHostController) {
 
 @Composable
 fun CustomNavItem(route: String, icon: androidx.compose.ui.graphics.vector.ImageVector, currentRoute: String?, navController: NavHostController) {
-    Box(
+    val isSelected = currentRoute == route
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .size(50.dp)
             .clickable { navController.navigate(route) }
-            .background(
-                color = if (currentRoute == route) Color.White else Color.Transparent,
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
+            .padding(4.dp) // Adjust spacing
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (currentRoute == route) Color(0xFFFF0266) else Color.White, // Highlight active tab
-            modifier = Modifier.size(28.dp)
+            tint = if (isSelected) Color.White else Color.LightGray,
+            modifier = Modifier.size(24.dp) // Smaller icon
         )
+        if (isSelected) {
+            Spacer(modifier = Modifier.height(3.dp))
+            Box(
+                modifier = Modifier
+                    .width(8.dp)
+                    .height(3.dp)
+                    .background(Color.White)
+            )
+        }
     }
 }

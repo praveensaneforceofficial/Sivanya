@@ -5,8 +5,10 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
@@ -33,135 +35,160 @@ import retrofit2.Response
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
-    val context = LocalContext.current
+    MainScreen(navController) {
+        val context = LocalContext.current
 
-    var fullName by remember { mutableStateOf("Loading...") }
-    var email by remember { mutableStateOf("Loading...") }
-    var phone by remember { mutableStateOf("Loading...") }
-    var address by remember { mutableStateOf("Loading...") }
-    var loading by remember { mutableStateOf(true) }
-    var isSaving by remember { mutableStateOf(false) }
-    var profileImage by remember { mutableStateOf("") }
+        var fullName by remember { mutableStateOf("Loading...") }
+        var email by remember { mutableStateOf("Loading...") }
+        var phone by remember { mutableStateOf("Loading...") }
+        var address by remember { mutableStateOf("Loading...") }
+        var loading by remember { mutableStateOf(true) }
+        var isSaving by remember { mutableStateOf(false) }
+        var profileImage by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        fetchUserDetails(context) { user, error ->
-            if (error != null) {
-                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-            } else {
-                fullName = user["full_name"] ?: "N/A"
-                email = user["email"] ?: "N/A"
-                phone = user["phone"] ?: "N/A"
-                address = user["address"] ?: "N/A"
-                profileImage = user["profile_image"] ?: ""  // Optional profile image
-            }
-            loading = false
-        }
-    }
-
-    fun logoutUser() {
-        val sharedPreferences = context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
-        sharedPreferences.edit().clear().apply()
-        navController.navigate("login") {
-            popUpTo("home") { inclusive = true }
-        }
-    }
-
-    fun saveProfile() {
-        isSaving = true
-        val updatedProfile = UserProfileUpdateRequest(fullName, email, phone, address)
-        val apiService = RetrofitClient.instance.create(ApiInterface::class.java)
-        val call = apiService.updateUserProfile(updatedProfile)
-
-        call.enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                isSaving = false
-                if (response.isSuccessful) {
-                    Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+        LaunchedEffect(Unit) {
+            fetchUserDetails(context) { user, error ->
+                if (error != null) {
+                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(context, "Failed to update profile", Toast.LENGTH_SHORT).show()
+                    fullName = user["full_name"] ?: "N/A"
+                    email = user["email"] ?: "N/A"
+                    phone = user["phone"] ?: "N/A"
+                    address = user["address"] ?: "N/A"
+                    profileImage = user["profile_image"] ?: ""  // Optional profile image
                 }
+                loading = false
             }
-
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                isSaving = false
-                Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    Scaffold(
-        topBar = {
-            SmallTopAppBar(
-                title = { Text("Profile", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { logoutUser() }) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
-                    }
-                }
-            )
         }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Profile Image
-            Box(
-                contentAlignment = Alignment.Center,
+
+        fun logoutUser() {
+            val sharedPreferences =
+                context.getSharedPreferences("UserPreferences", Context.MODE_PRIVATE)
+            sharedPreferences.edit().clear().apply()
+            navController.navigate("login") {
+                popUpTo("home") { inclusive = true }
+            }
+        }
+
+        fun saveProfile() {
+            isSaving = true
+            val updatedProfile = UserProfileUpdateRequest(fullName, email, phone, address)
+            val apiService = RetrofitClient.instance.create(ApiInterface::class.java)
+            val call = apiService.updateUserProfile(updatedProfile)
+
+            call.enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
+                    isSaving = false
+                    if (response.isSuccessful) {
+                        Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        Toast.makeText(context, "Failed to update profile", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    isSaving = false
+                    Toast.makeText(context, "Network error: ${t.message}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            })
+        }
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                SmallTopAppBar(
+                    title = { Text("Profile", fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { logoutUser() }) {
+                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout")
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (profileImage.isNotEmpty()) {
-                    Image(
-                        painter = rememberAsyncImagePainter(profileImage),
-                        contentDescription = "Profile Image",
-                        modifier = Modifier.size(100.dp)
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_user_placeholder),
-                        contentDescription = "Placeholder Image",
-                        modifier = Modifier.size(100.dp)
+                // Profile Image
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                ) {
+                    if (profileImage.isNotEmpty()) {
+                        Image(
+                            painter = rememberAsyncImagePainter(profileImage),
+                            contentDescription = "Profile Image",
+                            modifier = Modifier.size(100.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_user_placeholder),
+                            contentDescription = "Placeholder Image",
+                            modifier = Modifier.size(100.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Editable Profile Fields
+                ProfileInputField(
+                    label = "Full Name",
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    textSize = 14.sp
+                )
+                ProfileInputField(label = "Email", value = email, readOnly = true, textSize = 14.sp)
+                ProfileInputField(
+                    label = "Phone",
+                    value = phone,
+                    onValueChange = { phone = it },
+                    textSize = 14.sp
+                )
+                ProfileInputField(
+                    label = "Address",
+                    value = address,
+                    onValueChange = { address = it },
+                    maxLines = 4,
+                    textSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Save Button
+                Button(
+                    onClick = { saveProfile() },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isSaving,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                ) {
+                    Text(
+                        text = if (isSaving) "Saving..." else "Save",
+                        fontSize = 16.sp,
+                        color = Color.White
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Editable Profile Fields
-            ProfileInputField(label = "Full Name", value = fullName, onValueChange = { fullName = it })
-            ProfileInputField(label = "Email", value = email, readOnly = true)
-            ProfileInputField(label = "Phone", value = phone, onValueChange = { phone = it })
-            ProfileInputField(label = "Address", value = address, onValueChange = { address = it }, maxLines = 4)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Save Button
-            Button(
-                onClick = { saveProfile() },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSaving,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
-            ) {
-                Text(text = if (isSaving) "Saving..." else "Save", fontSize = 18.sp, color = Color.White)
-            }
         }
     }
-}
-
-@Composable
-fun SmallTopAppBar(title: @Composable () -> Unit, navigationIcon: @Composable () -> Unit, actions: @Composable () -> Unit) {
-
 }
 
 @Composable
@@ -170,20 +197,28 @@ fun ProfileInputField(
     value: String,
     onValueChange: (String) -> Unit = {},
     readOnly: Boolean = false,
-    maxLines: Int = 1 // Default to a single-line input
+    maxLines: Int = 1,
+    textSize: androidx.compose.ui.unit.TextUnit = 16.sp // Default 16, now allowing customization
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = label, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
         OutlinedTextField(
             value = value,
             onValueChange = { if (!readOnly) onValueChange(it) },
             readOnly = readOnly,
             modifier = Modifier.fillMaxWidth(),
-            singleLine = maxLines == 1, // Prevents single-line restriction when maxLines > 1
+            singleLine = maxLines == 1,
             shape = RoundedCornerShape(12.dp),
-            maxLines = maxLines // Allows multiline for text areas
+            maxLines = maxLines,
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = textSize)
         )
     }
+}
+
+
+@Composable
+fun SmallTopAppBar(title: @Composable () -> Unit, navigationIcon: @Composable () -> Unit, actions: @Composable () -> Unit) {
+
 }
 
 

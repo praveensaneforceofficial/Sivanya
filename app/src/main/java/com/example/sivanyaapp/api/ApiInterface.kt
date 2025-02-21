@@ -1,5 +1,9 @@
 package com.example.sivanyaapp.api
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.http.Part
+import retrofit2.http.Multipart
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -18,6 +22,19 @@ interface ApiInterface {
 
     @POST("updateUser")  // Adjust endpoint based on your backend API
     fun updateUserProfile(@Body request: UserProfileUpdateRequest): Call<ResponseBody>
+
+    @POST("getProducts") // Adjust this endpoint as per your backend
+    fun getProducts(): Call<List<Product>>
+
+    @Multipart
+    @POST("https://api.cloudinary.com/v1_1/dfqnfl0pi/image/upload")
+    fun uploadImageToCloudinary(
+        @Part file: MultipartBody.Part,
+        @Part("upload_preset") uploadPreset: RequestBody
+    ): Call<CloudinaryResponse>
+
+    @POST("addProduct") // Backend API to store product data
+    fun uploadProductDetails(@Body product: ProductRequest): Call<ResponseBody>
 }
 
 
