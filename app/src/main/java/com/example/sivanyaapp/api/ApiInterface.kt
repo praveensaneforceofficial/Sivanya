@@ -42,6 +42,12 @@ interface ApiInterface {
     @POST("getProductById")
     fun getProductById(@Body request: ProductIdRequest): Call<Product>
 
+    @POST("toggleFavorite") // Adjust endpoint according to your backend
+    fun toggleFavorite(@Body request: FavoriteRequest): Call<ResponseBody>
+
+    @POST("checkFavorite")
+    fun checkFavoriteStatus(@Body request: FavoriteRequest): Call<ResponseBody>
+
 }
 
 

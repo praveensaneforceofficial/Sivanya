@@ -44,11 +44,9 @@ class MainActivity : ComponentActivity() {
                     composable("products") { ProductListScreen(navController) }
                     composable("productDetails/{productId}") { backStackEntry ->
                         val productId = backStackEntry.arguments?.getString("productId") ?: "0"
-                        ProductDetailScreen(productId)
+                        ProductDetailScreen(productId = productId, onBack = { navController.popBackStack() })
                     }
-
                 }
-
             }
         }
     }
